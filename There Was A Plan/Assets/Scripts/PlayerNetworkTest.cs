@@ -1,13 +1,30 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using Mirror;
+using Photon.Pun;
 
-public class PlayerNetworkTest : NetworkBehaviour
+public class PlayerNetworkTest : MonoBehaviourPun
 {
+    [Tooltip("The local player instance. Use this to know if the local player is represented in the Scene")]
+    public static GameObject LocalPlayerInstance;
+
+    private void Start()
+    {
+        
+    }
+
+    private void Awake()
+    {
+        if(photonView.IsMine)
+        {
+            PlayerNetworkTest.LocalPlayerInstance = this.gameObject;
+        }
+        DontDestroyOnLoad(this.gameObject);
+    }
+
     void HandleMove()
     {
-        if(isLocalPlayer)
+        if(photonView.IsMine)
         {
             float moveH = Input.GetAxis("Horizontal");
             float moveV = Input.GetAxis("Vertical");
@@ -18,6 +35,7 @@ public class PlayerNetworkTest : NetworkBehaviour
 
     private void Update()
     {
+        if (!photonView.IsMine && PhotonNetwork.IsConnected) return;
         HandleMove();
     }
 }
