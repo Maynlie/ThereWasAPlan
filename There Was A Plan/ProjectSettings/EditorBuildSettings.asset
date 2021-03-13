@@ -4,5 +4,14 @@
 EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
-  m_Scenes: []
+  m_Scenes:
+  - enabled: 1
+    path: Assets/Scenes/TestPhoton.unity
+    guid: 818681c796ee4452cb4e1fb10f257d9c
+  - enabled: 1
+    path: Assets/Scenes/TestRoom1.unity
+    guid: 2368dcf40addd4210b78e85ac139de06
+  - enabled: 1
+    path: Assets/Scenes/TestRoom2.unity
+    guid: d52a92e46345042c4a32d2e7965ac26b
   m_configObjects: {}
