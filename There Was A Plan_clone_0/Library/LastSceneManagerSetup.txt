@@ -1,5 +1,5 @@
 sceneSetups:
-- path: Assets/Scenes/TestClement.unity
+- path: Assets/Scenes/TestPhoton.unity
   isLoaded: 1
   isActive: 1
   isSubScene: 0
