@@ -20,14 +20,9 @@ public class FOVScript : MonoBehaviour
             if (m != null)
             {
                 if (Vector3.Distance(child.position, player.transform.position) < visibleDistance)
-                {
                     m.enabled = true;
-                }
                 else
-                {
                     m.enabled = false;
-
-                }
             }
             
         }
