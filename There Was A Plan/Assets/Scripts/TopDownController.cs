@@ -8,7 +8,7 @@ public class TopDownController : MonoBehaviour
     //Player Camera variables
     public enum CameraDirection { x, z }
     public CameraDirection cameraDirection = CameraDirection.x;
-    public float cameraHeight = 20f;
+    public float cameraHeight = 10f;
     public float cameraDistance = 7f;
     public Camera playerCamera;
     //public GameObject targetIndicatorPrefab;
