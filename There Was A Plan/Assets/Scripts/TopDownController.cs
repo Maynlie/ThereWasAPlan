@@ -8,7 +8,7 @@ public class TopDownController : MonoBehaviour
     //Player Camera variables
     public enum CameraDirection { x, z }
     public CameraDirection cameraDirection = CameraDirection.x;
-    public float cameraHeight = 20f;
+    public float cameraHeight = 10f;
     public float cameraDistance = 7f;
     public Camera playerCamera;
     //public GameObject targetIndicatorPrefab;
@@ -93,14 +93,17 @@ public class TopDownController : MonoBehaviour
 
         grounded = false;
 
-        //Mouse cursor offset effect
-        playerPosOnScreen = playerCamera.WorldToViewportPoint(transform.position);
-        cursorPosition = playerCamera.ScreenToViewportPoint(Input.mousePosition);
-        offsetVector = cursorPosition - playerPosOnScreen;
+        if(playerCamera != null)
+        {
+            //Mouse cursor offset effect
+            playerPosOnScreen = playerCamera.WorldToViewportPoint(transform.position);
+            cursorPosition = playerCamera.ScreenToViewportPoint(Input.mousePosition);
+            offsetVector = cursorPosition - playerPosOnScreen;
 
-        //Camera follow
-        playerCamera.transform.position = Vector3.Lerp(playerCamera.transform.position, transform.position + cameraOffset, Time.deltaTime * 7.4f);
-        //playerCamera.transform.LookAt(transform.position + new Vector3(-offsetVector.y * 2, 0, offsetVector.x * 2));
+            //Camera follow
+            playerCamera.transform.position = Vector3.Lerp(playerCamera.transform.position, transform.position + cameraOffset, Time.deltaTime * 7.4f);
+            //playerCamera.transform.LookAt(transform.position + new Vector3(-offsetVector.y * 2, 0, offsetVector.x * 2));
+        }
 
         //Aim target position and rotation
         //targetObject.transform.position = GetAimTargetPos();

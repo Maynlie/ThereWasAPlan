@@ -16,28 +16,43 @@ public class SimpleGrabSystem : MonoBehaviour
     // Reference to the currently held item.
     private PickableItem pickedItem;
 
-    private PickableItem canBePicked;
+    private GameObject canBePicked;
 
-    public CapsuleCollider collider;
+    public BoxCollider playerCollider;
 
     /// <summary>
     /// Method called very frame.
     /// </summary>
     private void Update()
     {
-        // Execute logic only on button pressed
+        // Execute logic only on button pressed!
         if (Input.GetButtonDown("Fire1"))
         {
-            Debug.Log("boop");
             // Check if player picked some item already
             if (pickedItem)
             {
-                // If yes, drop picked item
-                DropItem(pickedItem);
+                if (canBePicked && canBePicked.GetComponent<Actionnable>())
+                {
+                    Debug.Log("Gonna activate");
+                    canBePicked.GetComponent<Actionnable>().activate(pickedItem);
+                }
+                else
+                { 
+                    // If yes, drop picked item
+                    DropItem(pickedItem);
+                }
             }
             else if (canBePicked)
             {
-                PickItem(canBePicked);
+                if (canBePicked.GetComponent<Actionnable>())
+                {
+                    Debug.Log("Gonna activate");
+                    canBePicked.GetComponent<Actionnable>().activate(null);
+                }
+                if (canBePicked.GetComponent<PickableItem>())
+                {
+                    PickItem(canBePicked.GetComponent<PickableItem>());
+                }
             }
         }
     }
@@ -57,12 +72,25 @@ public class SimpleGrabSystem : MonoBehaviour
         item.Rb.angularVelocity = Vector3.zero;
 
         // Set Slot as a parent
+
+        if (item.isCarriable)
+        {
+            //item.transform.position = new Vector3(
+            //    item.transform.position.x,
+            //    playerCollider.transform.position.y + (playerCollider.size.y * playerCollider.transform.localScale.y / 2),
+            //    item.transform.position.z
+            //);
+            item.transform.position = slot.transform.position;
+        }
+        else
+        {
+            item.transform.position += (item.transform.position - playerCollider.transform.position) * 0.2f;
+        }
         item.transform.SetParent(slot);
 
         // Reset position and rotation
         //item.transform.localPosition = Vector3.zero;
         //item.transform.localEulerAngles = Vector3.zero;
-
     }
 
     /// <summary>
@@ -81,20 +109,22 @@ public class SimpleGrabSystem : MonoBehaviour
         item.Rb.isKinematic = false;
 
         // Add force to throw item a little bit
-        item.Rb.AddForce(item.transform.forward * 2, ForceMode.VelocityChange);
+        //item.Rb.AddForce(item.transform.forward * 2, ForceMode.VelocityChange);
     }
 
-    void OnCollisionEnter(Collision collision)
-    {;
-        foreach (ContactPoint contact in collision.contacts)
+    void OnTriggerEnter(Collider otherCollider)
+    {
+        if (otherCollider.gameObject.GetComponent<PickableItem>() != null || otherCollider.gameObject.GetComponent<Actionnable>() != null)
         {
-            Debug.DrawRay(contact.point, contact.normal, Color.white);
-            canBePicked = contact.otherCollider.gameObject.GetComponent<PickableItem>();
-            if (canBePicked)
-            {
-                Debug.Log("I can grab that");
-            }
+            canBePicked = otherCollider.gameObject;
+            Debug.Log("I can grab that");
         }
+    }
+
+    void OnTriggerExit(Collider otherCollider)
+    {
+        canBePicked = null;
+        Debug.Log("I can't grab it anymore");
     }
 }
 

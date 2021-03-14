@@ -5,6 +5,8 @@ using UnityEngine;
 [RequireComponent(typeof(Rigidbody))]
 public class PickableItem : MonoBehaviour
 {
+    public bool isCarriable;
+
     // Reference to the rigidbody
     private Rigidbody rb;
     public Rigidbody Rb => rb;
