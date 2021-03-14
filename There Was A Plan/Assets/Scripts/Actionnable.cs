@@ -5,7 +5,7 @@ using UnityEngine;
 public class Actionnable : MonoBehaviour
 {
 
-    public PickableItem requiredToActivate;
+    public GameObject requiredToActivate;
 
     // Start is called before the first frame update
     void Start()
@@ -19,7 +19,7 @@ public class Actionnable : MonoBehaviour
         
     }
 
-    public void activate(PickableItem userHandles)
+    public void activate(GameObject userHandles)
     {
         
         if (!requiredToActivate || userHandles == requiredToActivate)

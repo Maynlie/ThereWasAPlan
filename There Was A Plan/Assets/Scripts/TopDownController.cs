@@ -1,8 +1,6 @@
 using UnityEngine;
 
 [RequireComponent(typeof(Rigidbody))]
-//[RequireComponent(typeof(CapsuleCollider))]
-
 public class TopDownController : MonoBehaviour
 {
     //Player Camera variables
@@ -26,20 +24,28 @@ public class TopDownController : MonoBehaviour
     Vector2 playerPosOnScreen;
     Vector2 cursorPosition;
     Vector2 offsetVector;
-    //Plane that represents imaginary floor that will be used to calculate Aim target position
-    Plane surfacePlane = new Plane();
+
+    // Reference to the currently held item.
+    private GameObject pickedItem;
+
+    private GameObject itemAtHand;
+
+    // Reference to the slot for holding picked item.
+    [SerializeField]
+    private Transform slot;
+
+    public BoxCollider interactionCollider;
+
+    private bool isHidden;
+    private Vector3 returnPosition;
+
+    private float actionCooldown = 0;
+    public float cooldownLength = 0.2f;
 
     void Awake()
     {
         r = GetComponent<Rigidbody>();
         r.freezeRotation = true;
-        // r.useGravity = false;
-
-        ////Instantiate aim target prefab
-        //if (targetIndicatorPrefab)
-        //{
-        //    targetObject = Instantiate(targetIndicatorPrefab, Vector3.zero, Quaternion.identity) as GameObject;
-        //}
 
         //Hide the cursor
         Cursor.visible = true;
@@ -47,6 +53,11 @@ public class TopDownController : MonoBehaviour
 
     void FixedUpdate()
     {
+        if (actionCooldown > 0)
+        {
+            actionCooldown -= 0.02f;
+        }
+
         //Setup camera offset
         Vector3 cameraOffset = Vector3.zero;
         if (cameraDirection == CameraDirection.x)
@@ -61,18 +72,12 @@ public class TopDownController : MonoBehaviour
         if (grounded)
         {
             Vector3 targetVelocity = Vector3.zero;
-            // Calculate how fast we should be moving
-            //if (cameraDirection == CameraDirection.x)
-            //{
-            //    targetVelocity = new Vector3(Input.GetAxis("Horizontal") * (cameraDistance >= 0 ? -1 : 1), 0, Input.GetAxis("Vertical") * (cameraDistance >= 0 ? 1 : -1));
-            //}
-            //else if (cameraDirection == CameraDirection.z)
-            //{
-            //    targetVelocity = new Vector3(Input.GetAxis("Vertical") * (cameraDistance >= 0 ? -1 : 1), 0, Input.GetAxis("Horizontal") * (cameraDistance >= 0 ? -1 : 1));
-            //}
-            targetVelocity = new Vector3(Input.GetAxis("Horizontal"), 0, Input.GetAxis("Vertical"));
-            targetVelocity *= speed;
-
+            if (!isHidden)
+            { 
+                targetVelocity = new Vector3(Input.GetAxis("Horizontal"), 0, Input.GetAxis("Vertical"));
+                targetVelocity *= speed;
+            }
+            
             // Apply a force that attempts to reach our target velocity
             Vector3 velocity = r.velocity;
             Vector3 velocityChange = (targetVelocity - velocity);
@@ -85,6 +90,55 @@ public class TopDownController : MonoBehaviour
             if (canJump && Input.GetButton("Jump"))
             {
                 r.velocity = new Vector3(velocity.x, CalculateJumpVerticalSpeed(), velocity.z);
+            }
+
+            // Execute logic only on button pressed!
+            if (Input.GetButtonDown("Fire1") && actionCooldown <= 0)
+            {
+                // Check if player picked some item already
+                if (isHidden)
+                {
+                    isHidden = false;
+                    r.transform.position = returnPosition;
+                    actionCooldown = cooldownLength;
+                    GameObject.Find("Body").GetComponent<MeshRenderer>().enabled = true;
+                }
+                else if (itemAtHand && itemAtHand.GetComponent<Hide>())
+                {
+                    Debug.Log("Gonna hide");
+                    isHidden = true;
+                    returnPosition = r.transform.position;
+                    GameObject.Find("Body").GetComponent<MeshRenderer>().enabled = false;
+                    r.transform.position = new Vector3(itemAtHand.transform.position.x, r.transform.position.y, itemAtHand.transform.position.z);
+                    actionCooldown = cooldownLength;
+                }
+                else if (pickedItem)
+                {
+                    if (itemAtHand && itemAtHand.GetComponent<Actionnable>())
+                    {
+                        Debug.Log("Gonna activate");
+                        itemAtHand.GetComponent<Actionnable>().activate(pickedItem);
+                    }
+                    else
+                    {
+                        // If yes, drop picked item
+                        DropItem(pickedItem);
+                    }
+                    actionCooldown = cooldownLength;
+                }
+                else if (itemAtHand)
+                {
+                    if (itemAtHand.GetComponent<Actionnable>())
+                    {
+                        Debug.Log("Gonna activate");
+                        itemAtHand.GetComponent<Actionnable>().activate(null);
+                    }
+                    if (itemAtHand.GetComponent<PickableItem>())
+                    {
+                        PickItem(itemAtHand);
+                    }
+                    actionCooldown = cooldownLength;
+                }
             }
         }
 
@@ -102,44 +156,33 @@ public class TopDownController : MonoBehaviour
 
             //Camera follow
             playerCamera.transform.position = Vector3.Lerp(playerCamera.transform.position, transform.position + cameraOffset, Time.deltaTime * 7.4f);
-            //playerCamera.transform.LookAt(transform.position + new Vector3(-offsetVector.y * 2, 0, offsetVector.x * 2));
         }
-
-        //Aim target position and rotation
-        //targetObject.transform.position = GetAimTargetPos();
-        //targetObject.transform.LookAt(new Vector3(transform.position.x, targetObject.transform.position.y, transform.position.z));
-
-        //Player rotation
-        // transform.LookAt(new Vector3(targetObject.transform.position.x, transform.position.y, targetObject.transform.position.z));
-    }
-
-    Vector3 GetAimTargetPos()
-    {
-        //Update surface plane
-        surfacePlane.SetNormalAndPosition(Vector3.up, transform.position);
-
-        //Create a ray from the Mouse click position
-        Ray ray = playerCamera.ScreenPointToRay(Input.mousePosition);
-
-        //Initialise the enter variable
-        float enter = 0.0f;
-
-        if (surfacePlane.Raycast(ray, out enter))
-        {
-            //Get the point that is clicked
-            Vector3 hitPoint = ray.GetPoint(enter);
-
-            //Move your cube GameObject to the point where you clicked
-            return hitPoint;
-        }
-
-        //No raycast hit, hide the aim target by moving it far away
-        return new Vector3(-5000, -5000, -5000);
     }
 
     void OnCollisionStay()
     {
         grounded = true;
+    }
+
+    void OnTriggerEnter(Collider otherCollider)
+    {
+        if ((otherCollider.gameObject.GetComponent<PickableItem>() != null
+            || otherCollider.gameObject.GetComponent<Actionnable>() != null
+            || otherCollider.gameObject.GetComponent<Hide>() != null)
+            && otherCollider.gameObject != pickedItem)
+        {
+            Debug.Log("I can interact with " + otherCollider.gameObject.name);
+            itemAtHand = otherCollider.gameObject;
+        }
+    }
+
+    void OnTriggerExit(Collider otherCollider)
+    {
+        if (otherCollider.gameObject == itemAtHand)
+        {
+            Debug.Log("I can't interact anymore with" + otherCollider.gameObject.name);
+            itemAtHand = null;
+        }
     }
 
     float CalculateJumpVerticalSpeed()
@@ -148,4 +191,48 @@ public class TopDownController : MonoBehaviour
         // for the character to reach at the apex.
         return Mathf.Sqrt(2 * jumpHeight * gravity);
     }
+
+    /// <summary>
+    /// Method for picking up item.
+    /// </summary>
+    /// <param name="item">Item.</param>
+    private void PickItem(GameObject item)
+    {
+        // Assign reference
+        pickedItem = item;
+
+        // Disable rigidbody and reset velocities
+        item.GetComponent<PickableItem>().Rb.isKinematic = true;
+        item.GetComponent<PickableItem>().Rb.velocity = Vector3.zero;
+        item.GetComponent<PickableItem>().Rb.angularVelocity = Vector3.zero;
+
+        // Set Slot as a parent
+
+        if (item.GetComponent<PickableItem>().isCarriable)
+        {
+            item.transform.position = slot.transform.position;
+        }
+        else
+        {
+            item.transform.position += (item.transform.position - interactionCollider.transform.position) * 0.2f;
+        }
+        item.transform.SetParent(slot);
+    }
+
+    /// <summary>
+    /// Method for dropping item.
+    /// </summary>
+    /// <param name="item">Item.</param>
+    private void DropItem(GameObject item)
+    {
+        // Remove reference
+        pickedItem = null;
+
+        // Remove parent
+        item.transform.SetParent(null);
+
+        // Enable rigidbody
+        item.GetComponent<PickableItem>().Rb.isKinematic = false;
+    }
+
 }
