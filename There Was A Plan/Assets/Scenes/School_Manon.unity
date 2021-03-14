@@ -139,7 +139,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!108 &705507994
 Light:
   m_ObjectHideFlags: 0
@@ -306,6 +306,14 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 4441045384309553152, guid: 6bbadb025d817c145be6e7431c01b50e, type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: fddf3f5ac313cf5449d4742b913d5262, type: 2}
+    - target: {fileID: 4796555369010692483, guid: 6bbadb025d817c145be6e7431c01b50e, type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: 77763d4eadc46a84b8ddfad85c2d4b67, type: 2}
     - target: {fileID: 6960583754779535845, guid: 6bbadb025d817c145be6e7431c01b50e, type: 3}
       propertyPath: m_Name
       value: School
@@ -354,5 +362,9 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 7999066967976544750, guid: 6bbadb025d817c145be6e7431c01b50e, type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: 77763d4eadc46a84b8ddfad85c2d4b67, type: 2}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 6bbadb025d817c145be6e7431c01b50e, type: 3}
