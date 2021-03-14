@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Pathfinding;
 using UnityEngine;
 
 public class DemonIA : MonoBehaviour
@@ -7,36 +8,48 @@ public class DemonIA : MonoBehaviour
     private enum IAState { IDLE, CHECK_SOUND, CHASE, ALERT, LOOK_AROUND, BACK_TO_IDLE, BACK_TO_BED };
     private IAState state;
     [SerializeField]
-    Vector3 startPoint;
+    Vector2 startPoint;
     [SerializeField]
-    Vector3 soundPoint;
+    Vector2 soundPoint;
     [SerializeField]
-    Vector3 childPos;
+    Vector2 childPos;
     [SerializeField]
-    Vector3 bedPos;
+    Vector2 bedPos;
     [SerializeField]
-    Vector3[] rondePos;
+    Vector2[] rondePos;
+
+    Vector2 currentTarget;
+
+    Seeker seeker;
+    Rigidbody rb;
 
     private float timer = 0.0f;
-    private int currentPoint = -1;
+    private int currentPoint = 0;
+
+    public float speed = 200f;
+    public float nextDist = 3f;
+
+    Path path;
+    int currentWayPoint = 0;
+    bool reached = false;
+
     // Start is called before the first frame update
     void Start()
     {
         state = IAState.IDLE;
-        transform.position = startPoint;
+        transform.position = new Vector3(startPoint.x, startPoint.y, 1.5f);
+        seeker = GetComponent<Seeker>();
+        rb = GetComponent<Rigidbody>();
+        currentTarget = startPoint;
+        Debug.Log("currentTarget" + currentTarget);
+
+        InvokeRepeating("UpdatePath", 0.0f, 0.5f);
+        
     }
 
-    // Update is called once per frame
-    void Update()
+    void UpdatePath()
     {
-        if(Input.GetKeyDown(KeyCode.X))
-        {
-            state = IAState.CHECK_SOUND;
-        }
-        if (Input.GetKeyDown(KeyCode.C))
-        {
-            state = IAState.CHASE;
-        }
+        Debug.Log(state);
         switch (state)
         {
             case IAState.IDLE:
@@ -51,9 +64,6 @@ public class DemonIA : MonoBehaviour
             case IAState.ALERT:
                 alert();
                 break;
-            case IAState.LOOK_AROUND:
-                lookAround();
-                break;
             case IAState.BACK_TO_IDLE:
                 backToIdle();
                 break;
@@ -61,16 +71,79 @@ public class DemonIA : MonoBehaviour
                 backToBed();
                 break;
         }
+        if (state != IAState.IDLE && state != IAState.LOOK_AROUND)
+        {
+            Debug.Log("Seek for target " + currentTarget + "with state" + state);
+            seeker.StartPath(transform.position, currentTarget, onPathComplete);
+        } else
+        {
+            path = null;
+        }
+    }
+
+    // Update is called once per frame
+    void Update()
+    {
+        if(Input.GetKeyDown(KeyCode.X))
+        {
+            state = IAState.CHECK_SOUND;
+            path = null;
+            reached = false;
+        }
+        if (Input.GetKeyDown(KeyCode.C))
+        {
+            state = IAState.CHASE;
+        }
+        if(state == IAState.LOOK_AROUND)
+        {
+            lookAround();
+        }
+        if (path == null) return;
+        if(currentWayPoint >= path.vectorPath.Count)
+        {
+            reached = true;
+            return;
+        } else
+        {
+            reached = false;
+        }
+        if (state == IAState.LOOK_AROUND)
+        {
+            reached = false;
+            lookAround();
+        }
+        Vector2 direction = (path.vectorPath[currentWayPoint] - transform.position).normalized;
+        Vector2 force = direction * speed * Time.deltaTime;
+
+        transform.position += new Vector3(force.x, force.y, 0);
+
+        float distance = Vector2.Distance(transform.position, path.vectorPath[currentWayPoint]);
+
+        if(distance < nextDist)
+        {
+            currentWayPoint++;
+        }
+    }
+
+    void onPathComplete(Path p)
+    {
+        if(!p.error)
+        {
+            path = p;
+            currentWayPoint = 0;
+        }
     }
 
     void idle()
     {
-
+        
     }
 
     void checkSound()
     {
-        if (goToPoint(soundPoint))
+        currentTarget = soundPoint;
+        Debug.Log("currentTarget" + currentTarget);
+        if (reached)
         {
             state = IAState.LOOK_AROUND;
         }
@@ -78,18 +151,23 @@ public class DemonIA : MonoBehaviour
 
     void lookAround()
     {
-        Debug.Log("Looking Around");
         timer += Time.deltaTime;
-        if(timer >= 2.0f)
+        Debug.Log("Looking Around " + timer);
+        if (timer >= 2.0f)
         {
             timer = 0;
+            reached = false;
+            currentTarget = startPoint;
+            Debug.Log("currentTarget" + currentTarget);
             state = IAState.BACK_TO_IDLE;
         }
     }
 
     void backToIdle()
     {
-        if (goToPoint(startPoint))
+        currentTarget = startPoint;
+        Debug.Log("currentTarget" + currentTarget);
+        if (reached)
         {
             state = IAState.IDLE;
         }
@@ -97,7 +175,9 @@ public class DemonIA : MonoBehaviour
 
     void chase()
     {
-        if(goToPoint(childPos))
+        currentTarget = childPos;
+        Debug.Log("currentTarget" + currentTarget);
+        if (reached)
         {
             state = IAState.BACK_TO_BED;
         }
@@ -105,7 +185,9 @@ public class DemonIA : MonoBehaviour
 
     void backToBed()
     {
-        if (goToPoint(bedPos))
+        currentTarget = bedPos;
+        Debug.Log("currentTarget" + currentTarget);
+        if (reached)
         {
             if(checkBeds())
             {
@@ -125,48 +207,15 @@ public class DemonIA : MonoBehaviour
 
     void alert()
     {
-        if(currentPoint == -1)
-        {
-            float minDist = -1.0f;
-            int i = 0;
-            foreach(Vector3 v in rondePos)
-            {
-                Vector3 diff = v - transform.position;
-                float dist = Mathf.Sqrt(diff.x * diff.x + diff.y * diff.y);
-                if(minDist < 0.0f)
-                {
-                    minDist = dist;
-                    currentPoint = i;
-                } else if(dist < minDist)
-                {
-                    minDist = dist;
-                    currentPoint = i;
-                }
-                i++;
-            }
-        }
-        if(goToPoint(rondePos[currentPoint]))
+        currentTarget = rondePos[currentPoint];
+        Debug.Log("currentTarget" + currentTarget);
+        if (reached)
         {
             currentPoint++;
             if(currentPoint == rondePos.Length)
             {
                 currentPoint = 0;
             }
-        }
-    }
-
-    bool goToPoint(Vector3 target)
-    {
-        Vector3 diff = target - transform.position;
-        float dist = Mathf.Sqrt(diff.x * diff.x + diff.y * diff.y);
-        if (dist <= 0.5f)
-        {
-            return true;
-        }
-        else
-        {
-            transform.position += 0.5f * diff;
-            return false;
         }
     }
 }
