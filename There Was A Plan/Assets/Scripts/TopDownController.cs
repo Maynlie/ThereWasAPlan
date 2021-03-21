@@ -101,14 +101,14 @@ public class TopDownController : MonoBehaviour
                     isHidden = false;
                     r.transform.position = returnPosition;
                     actionCooldown = cooldownLength;
-                    GameObject.Find("Body").GetComponent<MeshRenderer>().enabled = true;
+                    GameObject.Find("Body").GetComponent<SpriteRenderer>().enabled = true;
                 }
                 else if (itemAtHand && itemAtHand.GetComponent<Hide>())
                 {
                     Debug.Log("Gonna hide");
                     isHidden = true;
                     returnPosition = r.transform.position;
-                    GameObject.Find("Body").GetComponent<MeshRenderer>().enabled = false;
+                    GameObject.Find("Body").GetComponent<SpriteRenderer>().enabled = false;
                     r.transform.position = new Vector3(itemAtHand.transform.position.x, r.transform.position.y, itemAtHand.transform.position.z);
                     actionCooldown = cooldownLength;
                 }
@@ -205,6 +205,7 @@ public class TopDownController : MonoBehaviour
         item.GetComponent<PickableItem>().Rb.isKinematic = true;
         item.GetComponent<PickableItem>().Rb.velocity = Vector3.zero;
         item.GetComponent<PickableItem>().Rb.angularVelocity = Vector3.zero;
+        item.GetComponent<BoxCollider>().enabled = false;
 
         // Set Slot as a parent
 
@@ -233,6 +234,7 @@ public class TopDownController : MonoBehaviour
 
         // Enable rigidbody
         item.GetComponent<PickableItem>().Rb.isKinematic = false;
+        item.GetComponent<BoxCollider>().enabled = true;
     }
 
 }

@@ -25,7 +25,7 @@ public class Actionnable : MonoBehaviour
         if (!requiredToActivate || userHandles == requiredToActivate)
         {
             Debug.Log("Activate");
-            Destroy(this.gameObject);
+            gameObject.GetComponent<DoorRotation>().Activate();
         }
         else
         {
