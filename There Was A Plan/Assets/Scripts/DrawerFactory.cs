@@ -12,7 +12,7 @@ public class DrawerFactory : MonoBehaviourPun
     {
         if (Input.GetMouseButtonDown(0))
         {
-            d = PhotonNetwork.Instantiate(prefab.name, new Vector3(0, 0, 0), Quaternion.identity, 0).GetComponent<Drawer>(); //Instantiate(prefab).GetComponent<Drawer>();
+            d = PhotonNetwork.Instantiate(prefab.name, new Vector3(0, 5, 0), Quaternion.identity, 0).GetComponent<Drawer>(); //Instantiate(prefab).GetComponent<Drawer>();
             Debug.Log("bbb");
         }
         if (Input.GetMouseButtonUp(0))

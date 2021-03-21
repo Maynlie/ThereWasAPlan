@@ -31,11 +31,11 @@ public class GameManager : MonoBehaviourPunCallbacks
         {
             Debug.LogError("PhotonNetwork : Trying to Load a level but we are not the master Client");
         }
-        else if(PhotonNetwork.CurrentRoom.PlayerCount == 2)
+        /*else if(PhotonNetwork.CurrentRoom.PlayerCount == 2)
         {
             Debug.LogFormat("PhotonNetwork : Loading Level : PlanificationScene");
             PhotonNetwork.LoadLevel("PlanificationScene");
-        }
+        }*/
         
     }
 
@@ -82,7 +82,11 @@ public class GameManager : MonoBehaviourPunCallbacks
             {
                 Debug.LogFormat("We are Instantiating LocalPlayer from {0}", SceneManagerHelper.ActiveSceneName);
                 // we're in a room. spawn a character for the local player. it gets synced by using PhotonNetwork.Instantiate
-                PhotonNetwork.Instantiate(this.playerPrefab.name, new Vector3(0f, 5f, 0f), Quaternion.identity, 0);
+                float x = -200 + 200 * (PhotonNetwork.CurrentRoom.PlayerCount - 1);
+                GameObject player = PhotonNetwork.Instantiate(this.playerPrefab.name, new Vector3(x, 0f, 0f), Quaternion.identity, 0);
+                //player.transform.SetParent(GameObject.Find("Canvas").transform);
+                //player.transform.parent = GameObject.Find("Canvas").transform;
+                //player.transform.position = new Vector3(-210f, -50f, 0f);
             }
             else
             {
@@ -94,6 +98,6 @@ public class GameManager : MonoBehaviourPunCallbacks
     // Update is called once per frame
     void Update()
     {
-        
+
     }
 }

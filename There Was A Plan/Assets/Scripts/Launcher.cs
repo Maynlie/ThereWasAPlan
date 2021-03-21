@@ -106,7 +106,7 @@ public class Launcher : MonoBehaviourPunCallbacks
 
             // #Critical
             // Load the Room Level.
-            PhotonNetwork.LoadLevel("LobbyScene");
+            PhotonNetwork.LoadLevel("Lobby");
         }
     }
 }

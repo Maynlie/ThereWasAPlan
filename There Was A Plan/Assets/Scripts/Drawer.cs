@@ -21,6 +21,11 @@ public class Drawer : MonoBehaviourPunCallbacks, IPunObservable
         }
     }
 
+    void Start()
+    {
+        isDrawing = false;
+    }
+
     // Update is called once per frame
     void Update()
     {
