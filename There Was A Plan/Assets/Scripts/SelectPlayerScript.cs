@@ -12,8 +12,8 @@ public class SelectPlayerScript : MonoBehaviourPunCallbacks, IPunObservable
     public GameObject readyLbl;
     public GameObject leftBtn;
     public GameObject rightBtn;
+    GameObject startBtn;
     bool isReady = false;
-    int nbReady = 0;
 
     void Awake()
     {
@@ -42,15 +42,29 @@ public class SelectPlayerScript : MonoBehaviourPunCallbacks, IPunObservable
             readyBtn.SetActive(false);
             readyLbl.SetActive(false);
         }
+        startBtn = GameObject.Find("StartBtn");
+        if (startBtn != null)
+        {
+            if (!PhotonNetwork.IsMasterClient)
+            {
+                startBtn.SetActive(false);
+            }
+            else
+            {
+                startBtn.GetComponent<Button>().onClick.AddListener(startLevel);
+            }
+        }
     }
 
     // Update is called once per frame
     void Update()
     {
         GetComponent<Image>().sprite = sprites[currentSprite];
-        if(PhotonNetwork.IsMasterClient && nbReady == 2)
-        {
-            nbReady = -1;
+    }
+
+    void startLevel()
+    {
+        if (PhotonNetwork.IsMasterClient && photonView.IsMine) {
             PhotonNetwork.LoadLevel("PlanificationDemo");
         }
     }
@@ -90,9 +104,10 @@ public class SelectPlayerScript : MonoBehaviourPunCallbacks, IPunObservable
         if (photonView.IsMine)
         {
             readyBtn.SetActive(false);
+            leftBtn.SetActive(false);
+            rightBtn.SetActive(false);
             readyLbl.SetActive(true);
             isReady = true;
-            nbReady++;
         }
     }
 
@@ -110,8 +125,9 @@ public class SelectPlayerScript : MonoBehaviourPunCallbacks, IPunObservable
             if(isReady)
             {
                 readyBtn.SetActive(false);
+                leftBtn.SetActive(false);
+                rightBtn.SetActive(false);
                 readyLbl.SetActive(true);
-                if(!photonView.IsMine) nbReady++;
             }
         }
     }
