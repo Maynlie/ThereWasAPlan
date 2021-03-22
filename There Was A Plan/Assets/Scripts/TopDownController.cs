@@ -117,7 +117,7 @@ public class TopDownController : MonoBehaviour
                     if (itemAtHand && itemAtHand.GetComponent<Actionnable>())
                     {
                         Debug.Log("Gonna activate");
-                        itemAtHand.GetComponent<Actionnable>().activate(pickedItem);
+                        itemAtHand.GetComponent<Actionnable>().Activate(pickedItem);
                     }
                     else
                     {
@@ -131,7 +131,8 @@ public class TopDownController : MonoBehaviour
                     if (itemAtHand.GetComponent<Actionnable>())
                     {
                         Debug.Log("Gonna activate");
-                        itemAtHand.GetComponent<Actionnable>().activate(null);
+                        Debug.Log(itemAtHand.GetComponent<Actionnable>());
+                        itemAtHand.GetComponent<Actionnable>().Activate(null);
                     }
                     if (itemAtHand.GetComponent<PickableItem>())
                     {

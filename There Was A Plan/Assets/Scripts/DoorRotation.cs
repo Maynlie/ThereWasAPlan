@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Animations;
 
-public class DoorRotation : MonoBehaviour
+public class DoorRotation : Actionnable
 {
     public float openSpeed = 100;
     public float openAngle = 90;
@@ -30,11 +30,23 @@ public class DoorRotation : MonoBehaviour
         transform.localEulerAngles = new Vector3(transform.localEulerAngles.x, Mathf.LerpAngle(currentRotationAngle, defaultRotationAngle + (open ? openAngle : 0), openTime), transform.localEulerAngles.z);
     }
 
-    public void Activate()
+    public override bool Activate(GameObject userHandles)
     {
-        open = !open;
-        currentRotationAngle = transform.localEulerAngles.y;
-        openTime = 0;
+        bool canActivate = false;
+        Debug.Log("Activate Door");
+        if (base.Activate(userHandles))
+        {
+            Debug.Log("Open");
+            open = !open;
+            currentRotationAngle = transform.localEulerAngles.y;
+            openTime = 0;
+            canActivate = true;
+        }
+        else
+        {
+            Debug.Log("Can't open");
+        }
+        return canActivate;
     }
 }
 

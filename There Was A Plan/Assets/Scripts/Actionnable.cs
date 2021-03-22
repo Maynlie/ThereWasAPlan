@@ -2,34 +2,27 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Actionnable : MonoBehaviour
+public abstract class Actionnable : MonoBehaviour
 {
 
     public GameObject requiredToActivate;
+    public bool holdButton;
+    private AudioSource audioSource;
 
-    // Start is called before the first frame update
-    void Start()
+    void Awake()
     {
-        
+        audioSource = GetComponent<AudioSource>();
+        Debug.Log(audioSource);
     }
 
-    // Update is called once per frame
-    void Update()
+    public virtual bool Activate(GameObject userHandles)
     {
-        
-    }
-
-    public void activate(GameObject userHandles)
-    {
-        
+        bool canActivate = false;
         if (!requiredToActivate || userHandles == requiredToActivate)
         {
-            Debug.Log("Activate");
-            gameObject.GetComponent<DoorRotation>().Activate();
+            audioSource.Play();
+            canActivate = true;
         }
-        else
-        {
-            Debug.Log("Can't activate");
-        }
+        return canActivate;
     }
 }
