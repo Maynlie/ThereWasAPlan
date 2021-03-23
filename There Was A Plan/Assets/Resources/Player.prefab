@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 7974871803635166077}
   - component: {fileID: 7974871803635166075}
   - component: {fileID: 7974871803635166076}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: body
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -109,7 +109,7 @@ GameObject:
   - component: {fileID: 7974871804238547025}
   - component: {fileID: 3399502581710304922}
   - component: {fileID: 2685843316671955368}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Player
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -198,6 +198,7 @@ MonoBehaviour:
   OwnershipTransfer: 0
   observableSearch: 2
   ObservedComponents:
+  - {fileID: 7974871804238547025}
   - {fileID: 2685843316671955368}
   sceneViewId: 0
   InstantiationId: 0
@@ -229,7 +230,7 @@ GameObject:
   - component: {fileID: 7974871804714109453}
   - component: {fileID: 7974871804714109455}
   - component: {fileID: 7974871804714109454}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: InteractionCollider
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -285,7 +286,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7974871805277593960}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Grab Slot
   m_TagString: Untagged
   m_Icon: {fileID: 0}

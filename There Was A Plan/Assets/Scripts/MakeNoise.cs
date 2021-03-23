@@ -17,6 +17,7 @@ public class MakeNoise : Actionnable
         {
             Debug.Log("MAKE SOME NOISE !!!");
             canActivate = true;
+            GameObject.Find("Demon").GetComponent<DemonIA>().heardSound();
         }
         return canActivate;
     }

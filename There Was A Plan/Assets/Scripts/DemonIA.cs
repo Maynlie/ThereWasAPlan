@@ -2,26 +2,26 @@ using System.Collections;
 using System.Collections.Generic;
 using Pathfinding;
 using UnityEngine;
+using Photon.Pun;
 
-public class DemonIA : MonoBehaviour
+public class DemonIA : MonoBehaviourPun
 {
     private enum IAState { IDLE, CHECK_SOUND, CHASE, ALERT, LOOK_AROUND, BACK_TO_IDLE, BACK_TO_BED };
     private IAState state;
     [SerializeField]
-    Vector2 startPoint;
+    Vector3 startPoint;
     [SerializeField]
-    Vector2 soundPoint;
+    Vector3 soundPoint;
+    GameObject targetChild;
+    Vector3 childPos;
     [SerializeField]
-    Vector2 childPos;
+    Vector3 bedPos;
     [SerializeField]
-    Vector2 bedPos;
-    [SerializeField]
-    Vector2[] rondePos;
+    Vector3[] rondePos;
 
-    Vector2 currentTarget;
+    Vector3 currentTarget;
 
     Seeker seeker;
-    Rigidbody rb;
 
     private float timer = 0.0f;
     private int currentPoint = 0;
@@ -32,19 +32,23 @@ public class DemonIA : MonoBehaviour
     Path path;
     int currentWayPoint = 0;
     bool reached = false;
+    bool chaseMode = false;
+
+    public float visibleDistance = 2.0f;
 
     // Start is called before the first frame update
     void Start()
     {
-        state = IAState.IDLE;
-        transform.position = new Vector3(startPoint.x, startPoint.y, 1.5f);
-        seeker = GetComponent<Seeker>();
-        rb = GetComponent<Rigidbody>();
-        currentTarget = startPoint;
-        Debug.Log("currentTarget" + currentTarget);
+        if (photonView.IsMine && PhotonNetwork.IsMasterClient)
+        {
+            state = IAState.IDLE;
+            transform.position = new Vector3(startPoint.x, startPoint.y, startPoint.z);
+            seeker = GetComponent<Seeker>();
+            currentTarget = startPoint;
+            Debug.Log("currentTarget" + currentTarget);
 
-        InvokeRepeating("UpdatePath", 0.0f, 0.5f);
-        
+            InvokeRepeating("UpdatePath", 0.0f, 0.5f);
+        }
     }
 
     void UpdatePath()
@@ -73,7 +77,7 @@ public class DemonIA : MonoBehaviour
         }
         if (state != IAState.IDLE && state != IAState.LOOK_AROUND)
         {
-            Debug.Log("Seek for target " + currentTarget + "with state" + state);
+            Debug.Log("Seek for target " + currentTarget + "with state " + state);
             seeker.StartPath(transform.position, currentTarget, onPathComplete);
         } else
         {
@@ -84,44 +88,39 @@ public class DemonIA : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if(Input.GetKeyDown(KeyCode.X))
+        if (photonView.IsMine && PhotonNetwork.IsMasterClient)
         {
-            state = IAState.CHECK_SOUND;
-            path = null;
-            reached = false;
-        }
-        if (Input.GetKeyDown(KeyCode.C))
-        {
-            state = IAState.CHASE;
-        }
-        if(state == IAState.LOOK_AROUND)
-        {
-            lookAround();
-        }
-        if (path == null) return;
-        if(currentWayPoint >= path.vectorPath.Count)
-        {
-            reached = true;
-            return;
-        } else
-        {
-            reached = false;
-        }
-        if (state == IAState.LOOK_AROUND)
-        {
-            reached = false;
-            lookAround();
-        }
-        Vector2 direction = (path.vectorPath[currentWayPoint] - transform.position).normalized;
-        Vector2 force = direction * speed * Time.deltaTime;
+            if (state == IAState.LOOK_AROUND)
+            {
+                lookAround();
+            }
+            if (path == null) return;
+            if (currentWayPoint >= path.vectorPath.Count)
+            {
+                reached = true;
+                return;
+            }
+            else
+            {
+                reached = false;
+            }
+            if (state == IAState.LOOK_AROUND)
+            {
+                reached = false;
+                lookAround();
+            }
+            Vector3 direction = (path.vectorPath[currentWayPoint] - transform.position).normalized;
+            Vector3 force = direction * speed * Time.deltaTime;
 
-        transform.position += new Vector3(force.x, force.y, 0);
+            transform.position += new Vector3(force.x, 0, force.z);
+            if(targetChild != null) targetChild.transform.position = transform.position;
 
-        float distance = Vector2.Distance(transform.position, path.vectorPath[currentWayPoint]);
+            float distance = Vector2.Distance(transform.position, path.vectorPath[currentWayPoint]);
 
-        if(distance < nextDist)
-        {
-            currentWayPoint++;
+            if (distance < nextDist)
+            {
+                currentWayPoint++;
+            }
         }
     }
 
@@ -132,6 +131,21 @@ public class DemonIA : MonoBehaviour
             path = p;
             currentWayPoint = 0;
         }
+    }
+
+    public void heardSound()
+    {
+        state = IAState.CHECK_SOUND;
+        path = null;
+        reached = false;
+    }
+
+    public void childSpotted(GameObject c)
+    {
+        targetChild = c;
+        state = IAState.CHASE;
+        chaseMode = true;
+        targetChild.GetComponent<TopDownController>().locked = true;
     }
 
     void idle()
@@ -157,9 +171,17 @@ public class DemonIA : MonoBehaviour
         {
             timer = 0;
             reached = false;
-            currentTarget = startPoint;
-            Debug.Log("currentTarget" + currentTarget);
-            state = IAState.BACK_TO_IDLE;
+            if (chaseMode)
+            {
+                currentTarget = rondePos[currentPoint];
+                state = IAState.ALERT;
+            }
+            else
+            {
+                currentTarget = startPoint;
+                Debug.Log("currentTarget" + currentTarget);
+                state = IAState.BACK_TO_IDLE;
+            }
         }
     }
 
@@ -175,7 +197,7 @@ public class DemonIA : MonoBehaviour
 
     void chase()
     {
-        currentTarget = childPos;
+        currentTarget = targetChild.transform.position;
         Debug.Log("currentTarget" + currentTarget);
         if (reached)
         {
@@ -189,6 +211,7 @@ public class DemonIA : MonoBehaviour
         Debug.Log("currentTarget" + currentTarget);
         if (reached)
         {
+            targetChild = null;
             if(checkBeds())
             {
                 state = IAState.BACK_TO_IDLE;
@@ -215,6 +238,17 @@ public class DemonIA : MonoBehaviour
             if(currentPoint == rondePos.Length)
             {
                 currentPoint = 0;
+            }
+        }
+    }
+
+    void OnTriggerEnter(Collider otherCollider)
+    {
+        if (photonView.IsMine && PhotonNetwork.IsMasterClient)
+        {
+            if(otherCollider.gameObject.layer == 6 && !otherCollider.gameObject.GetComponent<TopDownController>().isHidden)
+            {
+                childSpotted(otherCollider.gameObject);
             }
         }
     }

@@ -332,18 +332,6 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
---- !u!114 &184981451
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 184981447}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 30f94f20032b91c4ab0ff7c083df4cba, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!65 &184981452
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -590,30 +578,6 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 1.3611947, y: 1.8972634, z: 0.37298095}
   m_Center: {x: -0.68059736, y: 0.9486317, z: -0.075547785}
---- !u!114 &435747930
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 435747925}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 30f94f20032b91c4ab0ff7c083df4cba, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
---- !u!114 &435747931
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 435747925}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 06a14c676b5b0334c99862cbc0b3663f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &591244599
 GameObject:
   m_ObjectHideFlags: 0
@@ -660,13 +624,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 30f94f20032b91c4ab0ff7c083df4cba, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-<<<<<<< HEAD
   requiredToActivate: {fileID: 0}
   holdButton: 0
   openSpeed: 100
   openAngle: 90
-=======
->>>>>>> Spawn des joueurs et couleur sélectionné
 --- !u!65 &591244602
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -952,7 +913,6 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 71.845, y: 15.717, z: -34.469}
-<<<<<<< HEAD
 --- !u!1 &737194365
 GameObject:
   m_ObjectHideFlags: 0
@@ -1028,8 +988,6 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-=======
->>>>>>> Spawn des joueurs et couleur sélectionné
 --- !u!1 &778679969 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 2676454382927556485, guid: 6bbadb025d817c145be6e7431c01b50e, type: 3}
@@ -1570,13 +1528,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 30f94f20032b91c4ab0ff7c083df4cba, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-<<<<<<< HEAD
   requiredToActivate: {fileID: 0}
   holdButton: 0
   openSpeed: 100
   openAngle: 90
-=======
->>>>>>> Spawn des joueurs et couleur sélectionné
 --- !u!1 &2031602783 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 3363257955828104767, guid: 6bbadb025d817c145be6e7431c01b50e, type: 3}

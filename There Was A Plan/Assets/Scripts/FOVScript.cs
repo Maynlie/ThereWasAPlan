@@ -8,6 +8,7 @@ public class FOVScript : MonoBehaviour
     public float rotationRange = 90f;
     public GameObject player;
     public GameObject actives;
+    public GameObject[] childs;
     public float visibleDistance = 2.0f;
 
     float elapsed = 0f;
@@ -25,6 +26,13 @@ public class FOVScript : MonoBehaviour
                     m.enabled = false;
             }
             
+        }
+        foreach(GameObject c in childs)
+        {
+            if(Vector3.Distance(c.transform.position, transform.position) < visibleDistance)
+            {
+                GetComponent<DemonIA>().childSpotted(c);
+            }
         }
         elapsed += Time.deltaTime;
         if(elapsed > timeToUpdate)

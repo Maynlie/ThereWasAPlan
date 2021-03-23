@@ -1,8 +1,9 @@
 using UnityEngine;
 using Photon.Pun;
+using Hashtable = ExitGames.Client.Photon.Hashtable;
 
 [RequireComponent(typeof(Rigidbody))]
-public class TopDownController : MonoBehaviourPun
+public class TopDownController : MonoBehaviourPun, IPunObservable
 {
     public static GameObject LocalPlayerInstance;
 
@@ -39,7 +40,7 @@ public class TopDownController : MonoBehaviourPun
 
     public BoxCollider interactionCollider;
 
-    private bool isHidden;
+    public bool isHidden;
     private Vector3 returnPosition;
 
     private float actionCooldown = 0;
@@ -49,6 +50,7 @@ public class TopDownController : MonoBehaviourPun
     private int currentSprite;
     public SpriteRenderer sprite;
     public Sprite[] sprites;
+    public bool locked = false;
 
     void Awake()
     {
@@ -61,15 +63,27 @@ public class TopDownController : MonoBehaviourPun
             Cursor.visible = true;
 
             TopDownController.LocalPlayerInstance = this.gameObject;
+        }
+    }
+
+    void Start()
+    {
+        if (photonView.IsMine)
+        {
             var str = "ColorP" + PhotonNetwork.LocalPlayer.ActorNumber;
             currentSprite = (int)PhotonNetwork.CurrentRoom.CustomProperties[str];
-            sprite.sprite = sprites[currentSprite];
         }
+    }
+
+    void Update()
+    {
+        sprite.sprite = sprites[currentSprite];
     }
 
     void FixedUpdate()
     {
-        if (photonView.IsMine) { 
+        if (photonView.IsMine) {
+            if (locked) return;
             if (actionCooldown > 0)
             {
                 actionCooldown -= 0.02f;
@@ -271,4 +285,15 @@ public class TopDownController : MonoBehaviourPun
         }
     }
 
+    public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
+    {
+        if (stream.IsWriting)
+        {
+            stream.SendNext(currentSprite);
+        }
+        else
+        {
+            currentSprite = (int)stream.ReceiveNext();
+        }
+    }
 }
