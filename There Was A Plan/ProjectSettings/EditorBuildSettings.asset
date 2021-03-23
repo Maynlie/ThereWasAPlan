@@ -9,18 +9,12 @@ EditorBuildSettings:
     path: Assets/Scenes/TestPhoton.unity
     guid: 818681c796ee4452cb4e1fb10f257d9c
   - enabled: 1
-    path: Assets/Scenes/LobbyScene.unity
-    guid: d2e62be7992c844e0940eaffa48b8e7c
-  - enabled: 1
-    path: Assets/Scenes/PlanificationScene.unity
-    guid: 390821c58d3394798adec6718d74e51a
-  - enabled: 1
     path: Assets/Scenes/Lobby.unity
     guid: c209b9e7806985f4992c5c7014faa644
   - enabled: 1
-    path: Assets/Scenes/School_Manon_Night.unity
-    guid: bcc89c932e3587742a376d28cad008ed
-  - enabled: 1
     path: Assets/Scenes/PlanificationDemo.unity
     guid: 8ca6e78f9c723e5468778e48330b1c9f
+  - enabled: 1
+    path: Assets/Scenes/School_Manon_Night.unity
+    guid: bcc89c932e3587742a376d28cad008ed
   m_configObjects: {}

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using Photon.Pun;
+using Hashtable = ExitGames.Client.Photon.Hashtable;
 
 public class SelectPlayerScript : MonoBehaviourPunCallbacks, IPunObservable
 {
@@ -29,6 +30,8 @@ public class SelectPlayerScript : MonoBehaviourPunCallbacks, IPunObservable
     void Start()
     {
         if (photonView.IsMine) {
+            var str = "ColorP" + PhotonNetwork.LocalPlayer.ActorNumber;
+            PhotonNetwork.CurrentRoom.SetCustomProperties(new Hashtable { { str, 0 } });
             currentSprite = 0;
             readyLbl.SetActive(false);
             readyBtn.GetComponent<Button>().onClick.AddListener(ready); ;
@@ -80,6 +83,8 @@ public class SelectPlayerScript : MonoBehaviourPunCallbacks, IPunObservable
             {
                 currentSprite++;
             }
+            var str = "ColorP" + PhotonNetwork.LocalPlayer.ActorNumber;
+            PhotonNetwork.CurrentRoom.SetCustomProperties(new Hashtable { { str, currentSprite } });
         }
     }
 
@@ -95,6 +100,8 @@ public class SelectPlayerScript : MonoBehaviourPunCallbacks, IPunObservable
             {
                 currentSprite--;
             }
+            var str = "ColorP" + PhotonNetwork.LocalPlayer.ActorNumber;
+            PhotonNetwork.CurrentRoom.SetCustomProperties(new Hashtable { { str, currentSprite } });
         }
         
     }

@@ -14,6 +14,9 @@ public class GameManager : MonoBehaviourPunCallbacks
 
     [Tooltip("The prefab to use for representing the player")]
     public GameObject playerPrefab;
+    public GameObject playerUIPrefab;
+
+    public GameObject[] startPoints;
 
     public override void OnLeftRoom()
     {
@@ -68,31 +71,43 @@ public class GameManager : MonoBehaviourPunCallbacks
         }
     }
 
+    private void Awake()
+    {
+        
+    }
+
     // Start is called before the first frame update
     [System.Obsolete]
     void Start()
     {
-        if (playerPrefab == null)
-        {
-            Debug.LogError("<Color=Red><a>Missing</a></Color> playerPrefab Reference. Please set it up in GameObject 'Game Manager'", this);
-        }
-        else
-        {
+        
             if (PlayerNetworkTest.LocalPlayerInstance == null)
             {
-                Debug.LogFormat("We are Instantiating LocalPlayer from {0}", SceneManagerHelper.ActiveSceneName);
-                // we're in a room. spawn a character for the local player. it gets synced by using PhotonNetwork.Instantiate
-                float x = -200 + 200 * (PhotonNetwork.CurrentRoom.PlayerCount - 1);
-                GameObject player = PhotonNetwork.Instantiate(this.playerPrefab.name, new Vector3(x, 0f, 0f), Quaternion.identity, 0);
-                //player.transform.SetParent(GameObject.Find("Canvas").transform);
-                //player.transform.parent = GameObject.Find("Canvas").transform;
-                //player.transform.position = new Vector3(-210f, -50f, 0f);
+                if (SceneManager.GetActiveScene().name == "School_Manon_Night")
+                {
+                var allPlayers = PhotonNetwork.PlayerList;
+                foreach(Player p in allPlayers)
+                {
+                    if(p == PhotonNetwork.LocalPlayer)
+                    {
+                        PhotonNetwork.Instantiate(this.playerPrefab.name, startPoints[p.ActorNumber - 1].transform.position, Quaternion.identity, 0);
+                        Debug.Log("playerNumber = " + p.ActorNumber);
+                    }
+                }
+                    
+                }
+                else
+                { 
+                    Debug.LogFormat("We are Instantiating LocalPlayer from {0}", SceneManagerHelper.ActiveSceneName);
+                    // we're in a room. spawn a character for the local player. it gets synced by using PhotonNetwork.Instantiate
+                    float x = -200 + 200 * (PhotonNetwork.CurrentRoom.PlayerCount - 1);
+                    PhotonNetwork.Instantiate(this.playerUIPrefab.name, new Vector3(x, 0f, 0f), Quaternion.identity, 0);
+                }
             }
             else
             {
                 Debug.LogFormat("Ignoring scene load for {0}", SceneManagerHelper.ActiveSceneName);
             }
-        }
     }
 
     // Update is called once per frame
