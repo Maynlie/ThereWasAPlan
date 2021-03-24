@@ -24,6 +24,7 @@ public class DemonIA : MonoBehaviourPun
     Seeker seeker;
 
     private float timer = 0.0f;
+    private float blindTimer = 0.0f;
     private int currentPoint = 0;
 
     public float speed = 200f;
@@ -33,6 +34,7 @@ public class DemonIA : MonoBehaviourPun
     int currentWayPoint = 0;
     bool reached = false;
     bool chaseMode = false;
+    bool isBlind = false;
 
     public float visibleDistance = 2.0f;
 
@@ -45,7 +47,6 @@ public class DemonIA : MonoBehaviourPun
             transform.position = new Vector3(startPoint.x, startPoint.y, startPoint.z);
             seeker = GetComponent<Seeker>();
             currentTarget = startPoint;
-            Debug.Log("currentTarget" + currentTarget);
 
             InvokeRepeating("UpdatePath", 0.0f, 0.5f);
         }
@@ -53,7 +54,7 @@ public class DemonIA : MonoBehaviourPun
 
     void UpdatePath()
     {
-        Debug.Log(state);
+        //Debug.Log(state);
         switch (state)
         {
             case IAState.IDLE:
@@ -77,7 +78,7 @@ public class DemonIA : MonoBehaviourPun
         }
         if (state != IAState.IDLE && state != IAState.LOOK_AROUND)
         {
-            Debug.Log("Seek for target " + currentTarget + "with state " + state);
+            //Debug.Log("Seek for target " + currentTarget + "with state " + state);
             seeker.StartPath(transform.position, currentTarget, onPathComplete);
         } else
         {
@@ -90,6 +91,14 @@ public class DemonIA : MonoBehaviourPun
     {
         if (photonView.IsMine && PhotonNetwork.IsMasterClient)
         {
+            if(isBlind)
+            {
+                blindTimer += Time.deltaTime;
+                if(blindTimer >= 1)
+                {
+                    isBlind = false;
+                }
+            }
             if (state == IAState.LOOK_AROUND)
             {
                 lookAround();
@@ -156,7 +165,6 @@ public class DemonIA : MonoBehaviourPun
     void checkSound()
     {
         currentTarget = soundPoint;
-        Debug.Log("currentTarget" + currentTarget);
         if (reached)
         {
             state = IAState.LOOK_AROUND;
@@ -166,7 +174,6 @@ public class DemonIA : MonoBehaviourPun
     void lookAround()
     {
         timer += Time.deltaTime;
-        Debug.Log("Looking Around " + timer);
         if (timer >= 2.0f)
         {
             timer = 0;
@@ -179,7 +186,6 @@ public class DemonIA : MonoBehaviourPun
             else
             {
                 currentTarget = startPoint;
-                Debug.Log("currentTarget" + currentTarget);
                 state = IAState.BACK_TO_IDLE;
             }
         }
@@ -188,7 +194,6 @@ public class DemonIA : MonoBehaviourPun
     void backToIdle()
     {
         currentTarget = startPoint;
-        Debug.Log("currentTarget" + currentTarget);
         if (reached)
         {
             state = IAState.IDLE;
@@ -198,19 +203,19 @@ public class DemonIA : MonoBehaviourPun
     void chase()
     {
         currentTarget = targetChild.transform.position;
-        Debug.Log("currentTarget" + currentTarget);
         if (reached)
         {
             state = IAState.BACK_TO_BED;
+            currentTarget = bedPos;
         }
     }
 
     void backToBed()
     {
         currentTarget = bedPos;
-        Debug.Log("currentTarget" + currentTarget);
         if (reached)
         {
+            targetChild.GetComponent<TopDownController>().locked = false;
             targetChild = null;
             if(checkBeds())
             {
@@ -231,7 +236,6 @@ public class DemonIA : MonoBehaviourPun
     void alert()
     {
         currentTarget = rondePos[currentPoint];
-        Debug.Log("currentTarget" + currentTarget);
         if (reached)
         {
             currentPoint++;
@@ -244,10 +248,15 @@ public class DemonIA : MonoBehaviourPun
 
     void OnTriggerEnter(Collider otherCollider)
     {
-        if (photonView.IsMine && PhotonNetwork.IsMasterClient)
+        if (photonView.IsMine && PhotonNetwork.IsMasterClient && !isBlind)
         {
-            if(otherCollider.gameObject.layer == 6 && !otherCollider.gameObject.GetComponent<TopDownController>().isHidden)
+            GameObject g = otherCollider.gameObject;
+            int layer = g.layer;
+            TopDownController top = g.GetComponent<TopDownController>();
+            bool h = top.isHidden;
+            if (otherCollider.gameObject.layer == 6 && !otherCollider.gameObject.GetComponent<TopDownController>().isHidden && state != IAState.BACK_TO_BED)
             {
+                Debug.Log("Child Spotted");
                 childSpotted(otherCollider.gameObject);
             }
         }

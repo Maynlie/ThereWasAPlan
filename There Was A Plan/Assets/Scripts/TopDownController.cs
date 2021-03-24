@@ -55,7 +55,7 @@ public class TopDownController : MonoBehaviourPun, IPunObservable
     void Awake()
     {
         if (photonView.IsMine)
-        { 
+        {
             r = GetComponent<Rigidbody>();
             r.freezeRotation = true;
 
