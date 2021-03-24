@@ -4955,7 +4955,7 @@ ParticleSystemRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 9679f325ee7eb1c4aa69c297ad83796a, type: 2}
+  - {fileID: 0}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -5013,7 +5013,7 @@ GameObject:
   - component: {fileID: 5654793282040219031}
   - component: {fileID: 5654793282040219030}
   - component: {fileID: 5654793282040219049}
-  - component: {fileID: 5654793282040219050}
+  - component: {fileID: 701196366233276018}
   m_Layer: 0
   m_Name: Victory Screen
   m_TagString: Untagged
@@ -5163,7 +5163,7 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
---- !u!114 &5654793282040219050
+--- !u!114 &701196366233276018
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -5172,10 +5172,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 5654793282040219029}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 990a18c455be91e48b39848c6732e200, type: 3}
+  m_Script: {fileID: 11500000, guid: 362c25383abd94944b4ef5ef4eecf592, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  victoryMusic: {fileID: 8300000, guid: 22431aebaee17473ab3ca61cdf17e57c, type: 3}
+  victoryMusic: {fileID: 8300000, guid: 4514ad039eaa2438b9f82d7c231b2630, type: 3}
 --- !u!1 &5654793282803854170
 GameObject:
   m_ObjectHideFlags: 0
@@ -10029,7 +10029,7 @@ ParticleSystemRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 9679f325ee7eb1c4aa69c297ad83796a, type: 2}
+  - {fileID: 0}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
